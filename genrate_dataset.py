@@ -1,5 +1,3 @@
-
-
 from requests import exceptions
 import argparse
 import requests
@@ -14,8 +12,8 @@ ap.add_argument("-o", "--output", required=True,
 args = vars(ap.parse_args())
 
 API_KEY = "enteryourkey"
-MAX_RESULTS = 100
-GROUP_SIZE = 50
+MAX_IMAGES = 100
+CLASS_SIZE = 50
 
 URL = "https://api.cognitive.microsoft.com/bing/v7.0/images/search"
 
@@ -25,27 +23,27 @@ EXCEPTIONS = set([IOError, FileNotFoundError,
 
 term = args["query"]
 headers = {"Ocp-Apim-Subscription-Key" : API_KEY}
-params = {"q": term, "offset": 0, "count": GROUP_SIZE}
+params = {"q": term, "offset": 0, "count": CLASS_SIZE}
 
 print("[INFO] searching Bing API for '{}'".format(term))
 search = requests.get(URL, headers=headers, params=params)
 search.raise_for_status()
 
 results = search.json()
-estNumResults = min(results["totalEstimatedMatches"], MAX_RESULTS)
-print("[INFO] {} total results for '{}'".format(estNumResults,
+ESTIMATE_RESULTS = min(results["totalEstimatedMatches"], MAX_IMAGES)
+print("[INFO] {} total results for '{}'".format(ESTIMATE_RESULTS,
 	term))
 
 total = 0
 
-for offset in range(0, estNumResults, GROUP_SIZE):
-	print(estNumResults)
-	print("[INFO] making request for group {}-{} of {}...".format(offset, offset + GROUP_SIZE, estNumResults))
+for offset in range(0, ESTIMATE_RESULTS, CLASS_SIZE):
+	print(ESTIMATE_RESULTS)
+	print("[INFO] making request for group {}-{} of {}...".format(offset, offset + CLASS_SIZE, ESTIMATE_RESULTS))
 	params["offset"] = offset
 	search = requests.get(URL, headers=headers, params=params)
 	search.raise_for_status()
 	results = search.json()
-	print("[INFO] saving images for group {}-{} of {}...".format(offset, offset + GROUP_SIZE, estNumResults))
+	print("[INFO] saving images for group {}-{} of {}...".format(offset, offset + CLASS_SIZE, ESTIMATE_RESULTS))
 
 	
 	for v in results["value"]:
